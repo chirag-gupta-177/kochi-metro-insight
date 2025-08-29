@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import kochiMetroLogo from "@/assets/kochi-metro-logo.png";
 
 interface NavbarProps {
   onLoginClick?: () => void;
@@ -16,7 +17,12 @@ const Navbar = ({ onLoginClick, isLoggedIn = false, activeTab, onTabClick }: Nav
       <nav className="w-full bg-background border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex-1">
+            <div className="flex-1 flex items-center gap-3">
+              <img 
+                src={kochiMetroLogo} 
+                alt="Kochi Metro Rail Limited Logo" 
+                className="h-8 w-auto"
+              />
               <h1 className="text-xl font-bold text-foreground">KOCHI METRO</h1>
             </div>
             
@@ -57,7 +63,12 @@ const Navbar = ({ onLoginClick, isLoggedIn = false, activeTab, onTabClick }: Nav
     <nav className="w-full bg-background/95 backdrop-blur-sm border-b border-border shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 flex items-center gap-3">
+            <img 
+              src={kochiMetroLogo} 
+              alt="Kochi Metro Rail Limited Logo" 
+              className="h-8 w-auto"
+            />
             <h1 className="text-xl font-bold text-foreground">KOCHI METRO</h1>
           </div>
           <div className="flex items-center">
