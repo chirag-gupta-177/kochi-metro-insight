@@ -10,9 +10,11 @@ interface NavbarProps {
   isLoggedIn?: boolean;
   activeTab?: string;
   onTabClick?: (tab: string) => void;
+  hideSearchBar?: boolean;
+  onUploadClick?: () => void;
 }
 
-const Navbar = ({ onLoginClick, onLogout, isLoggedIn = false, activeTab, onTabClick }: NavbarProps) => {
+const Navbar = ({ onLoginClick, onLogout, isLoggedIn = false, activeTab, onTabClick, hideSearchBar = false, onUploadClick }: NavbarProps) => {
   const tabs = ['All', 'Uploaded', 'Verified', 'Marked'];
 
   if (isLoggedIn) {
@@ -48,17 +50,20 @@ const Navbar = ({ onLoginClick, onLogout, isLoggedIn = false, activeTab, onTabCl
             </div>
             
             <div className="flex-1 flex justify-end items-center gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  type="search"
-                  placeholder="Search documents..."
-                  className="pl-10 w-64 h-9"
-                />
-              </div>
+              {!hideSearchBar && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    type="search"
+                    placeholder="Search documents..."
+                    className="pl-10 w-64 h-9"
+                  />
+                </div>
+              )}
               <Button 
                 variant="outline"
                 size="sm"
+                onClick={onUploadClick}
                 className="w-8 h-8 p-0 rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >
                 +

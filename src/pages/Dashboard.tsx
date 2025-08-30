@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/ui/navbar";
 import DocumentCard from "@/components/document-card";
 import DocumentModal from "@/components/ui/document-modal";
@@ -8,6 +9,7 @@ interface DashboardProps {
 }
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('All');
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [visitedDocuments, setVisitedDocuments] = useState<Set<string>>(new Set());
@@ -112,6 +114,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         activeTab={activeTab}
         onTabClick={setActiveTab}
         onLogout={onLogout}
+        onUploadClick={() => navigate('/upload')}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
