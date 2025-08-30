@@ -1,16 +1,19 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import kochiMetroLogo from "@/assets/kochi-metro-logo.png";
 
 interface NavbarProps {
   onLoginClick?: () => void;
+  onLogout?: () => void;
   isLoggedIn?: boolean;
   activeTab?: string;
   onTabClick?: (tab: string) => void;
 }
 
-const Navbar = ({ onLoginClick, isLoggedIn = false, activeTab, onTabClick }: NavbarProps) => {
-  const tabs = ['Inbox', 'Sent', 'Verified', 'Marked'];
+const Navbar = ({ onLoginClick, onLogout, isLoggedIn = false, activeTab, onTabClick }: NavbarProps) => {
+  const tabs = ['All', 'Uploaded', 'Verified', 'Marked'];
 
   if (isLoggedIn) {
     return (
@@ -44,13 +47,29 @@ const Navbar = ({ onLoginClick, isLoggedIn = false, activeTab, onTabClick }: Nav
               </div>
             </div>
             
-            <div className="flex-1 flex justify-end">
+            <div className="flex-1 flex justify-end items-center gap-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  type="search"
+                  placeholder="Search documents..."
+                  className="pl-10 w-64 h-9"
+                />
+              </div>
               <Button 
                 variant="outline"
                 size="sm"
                 className="w-8 h-8 p-0 rounded-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               >
                 +
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={onLogout}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Logout
               </Button>
             </div>
           </div>

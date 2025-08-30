@@ -1,5 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Star, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 interface DocumentCardProps {
   title: string;
@@ -8,11 +17,40 @@ interface DocumentCardProps {
   date?: string;
   language?: string;
   thumbnail?: string;
+  isVisited?: boolean;
+  isStarred?: boolean;
+  onClick?: () => void;
+  onStar?: () => void;
+  onLanguageChange?: (language: string) => void;
 }
 
-const DocumentCard = ({ title, snippet, department, date, language, thumbnail }: DocumentCardProps) => {
+const DocumentCard = ({ 
+  title, 
+  snippet, 
+  department, 
+  date, 
+  language, 
+  thumbnail, 
+  isVisited = false,
+  isStarred = false,
+  onClick,
+  onStar,
+  onLanguageChange
+}: DocumentCardProps) => {
+  const [selectedLanguage, setSelectedLanguage] = useState(language || "English");
+
+  const handleLanguageSelect = (lang: string) => {
+    setSelectedLanguage(lang);
+    onLanguageChange?.(lang);
+  };
+
   return (
-    <Card className="hover:shadow-md transition-shadow duration-normal cursor-pointer">
+    <Card 
+      className={`hover:shadow-md transition-all duration-normal cursor-pointer ${
+        isVisited ? 'bg-gray-50' : 'bg-background'
+      }`}
+      onClick={onClick}
+    >
       <CardContent className="p-4">
         <div className="flex gap-4">
           {/* Thumbnail */}
@@ -39,23 +77,61 @@ const DocumentCard = ({ title, snippet, department, date, language, thumbnail }:
               {snippet}
             </p>
             
-            {/* Metadata */}
-            <div className="flex flex-wrap gap-2">
-              {department && (
-                <Badge variant="secondary" className="text-xs">
-                  {department}
-                </Badge>
-              )}
-              {date && (
-                <Badge variant="outline" className="text-xs">
-                  {date}
-                </Badge>
-              )}
-              {language && (
-                <Badge variant="outline" className="text-xs text-primary border-primary">
-                  {language}
-                </Badge>
-              )}
+            {/* Metadata and Actions */}
+            <div className="flex flex-wrap items-center gap-2 justify-between">
+              <div className="flex flex-wrap gap-2">
+                {department && (
+                  <Badge variant="secondary" className="text-xs">
+                    {department}
+                  </Badge>
+                )}
+                {date && (
+                  <Badge variant="outline" className="text-xs">
+                    {date}
+                  </Badge>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {/* Language Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-6 px-2 text-xs gap-1"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {selectedLanguage}
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-32">
+                    <DropdownMenuItem onClick={() => handleLanguageSelect("English")}>
+                      English
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleLanguageSelect("Hindi")}>
+                      Hindi
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleLanguageSelect("Malayalam")}>
+                      Malayalam
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
+                {/* Star Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={`h-6 w-6 p-0 ${isStarred ? 'text-yellow-500' : 'text-muted-foreground'} hover:text-yellow-500`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onStar?.();
+                  }}
+                >
+                  <Star className={`h-4 w-4 ${isStarred ? 'fill-current' : ''}`} />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

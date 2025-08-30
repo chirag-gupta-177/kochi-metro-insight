@@ -1,20 +1,21 @@
 import { useState } from "react";
 import Navbar from "@/components/ui/navbar";
 import DocumentCard from "@/components/document-card";
-import ProblemStatement from "@/components/problem-statement";
-import { Button } from "@/components/ui/button";
+import DocumentModal from "@/components/ui/document-modal";
 
 interface DashboardProps {
   onLogout: () => void;
 }
 
 const Dashboard = ({ onLogout }: DashboardProps) => {
-  const [activeTab, setActiveTab] = useState('Inbox');
-  const [showProblemStatement, setShowProblemStatement] = useState(false);
+  const [activeTab, setActiveTab] = useState('All');
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [visitedDocuments, setVisitedDocuments] = useState<Set<string>>(new Set());
+  const [starredDocuments, setStarredDocuments] = useState<Set<string>>(new Set());
 
   // Mock data for different tabs
   const mockDocuments = {
-    Inbox: [
+    All: [
       {
         title: "Safety Circular - Emergency Brake Protocol Update",
         snippet: "Revised emergency braking procedures for all rolling stock operations. Implementation required by March 15th, 2024.",
@@ -44,7 +45,7 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         language: "English"
       }
     ],
-    Sent: [
+    Uploaded: [
       {
         title: "Monthly Operations Report - February 2024",
         snippet: "Comprehensive report on train punctuality, passenger loads, and operational efficiency metrics for February.",
@@ -73,7 +74,36 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
     ]
   };
 
-  const currentDocuments = mockDocuments[activeTab as keyof typeof mockDocuments] || [];
+  // Get documents for current tab, including starred documents for Marked tab
+  const getCurrentDocuments = () => {
+    if (activeTab === 'Marked') {
+      // Return all starred documents from all tabs
+      const allDocs = Object.values(mockDocuments).flat();
+      return allDocs.filter((_, index) => starredDocuments.has(`${index}`));
+    }
+    return mockDocuments[activeTab as keyof typeof mockDocuments] || [];
+  };
+
+  const currentDocuments = getCurrentDocuments();
+
+  const handleDocumentClick = (doc: any, index: number) => {
+    const docId = `${activeTab}-${index}`;
+    setVisitedDocuments(prev => new Set(prev).add(docId));
+    setSelectedDocument(doc);
+  };
+
+  const handleStarDocument = (index: number) => {
+    const docId = `${index}`;
+    setStarredDocuments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(docId)) {
+        newSet.delete(docId);
+      } else {
+        newSet.add(docId);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,43 +111,36 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         isLoggedIn={true}
         activeTab={activeTab}
         onTabClick={setActiveTab}
+        onLogout={onLogout}
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground">
             {activeTab} ({currentDocuments.length})
           </h1>
-          <div className="flex gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowProblemStatement(true)}
-              className="text-primary border-primary hover:bg-primary hover:text-primary-foreground"
-            >
-              Problem Statement
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={onLogout}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Logout
-            </Button>
-          </div>
         </div>
         
         <div className="space-y-4">
           {currentDocuments.length > 0 ? (
-            currentDocuments.map((doc, index) => (
-              <DocumentCard
-                key={index}
-                title={doc.title}
-                snippet={doc.snippet}
-                department={doc.department}
-                date={doc.date}
-                language={doc.language}
-              />
-            ))
+            currentDocuments.map((doc, index) => {
+              const docId = `${activeTab}-${index}`;
+              const globalIndex = Object.values(mockDocuments).flat().findIndex(d => d.title === doc.title);
+              return (
+                <DocumentCard
+                  key={index}
+                  title={doc.title}
+                  snippet={doc.snippet}
+                  department={doc.department}
+                  date={doc.date}
+                  language={doc.language}
+                  isVisited={visitedDocuments.has(docId)}
+                  isStarred={starredDocuments.has(`${globalIndex}`)}
+                  onClick={() => handleDocumentClick(doc, index)}
+                  onStar={() => handleStarDocument(globalIndex)}
+                />
+              );
+            })
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-lg">No documents in {activeTab}</p>
@@ -126,9 +149,10 @@ const Dashboard = ({ onLogout }: DashboardProps) => {
         </div>
       </main>
       
-      <ProblemStatement 
-        isOpen={showProblemStatement}
-        onClose={() => setShowProblemStatement(false)}
+      <DocumentModal 
+        isOpen={!!selectedDocument}
+        onClose={() => setSelectedDocument(null)}
+        title={selectedDocument?.title || ""}
       />
     </div>
   );
